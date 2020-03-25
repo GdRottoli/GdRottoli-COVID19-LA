@@ -34,19 +34,19 @@ colors = {
 app.layout = html.Div(
     style={'backgroundColor': colors['background']},
     children=[
-        html.H1(children='COVID-19 in Latinoamerica',
+        html.H1(children='COVID-19 en Latinoamerica',
                 style={
                  'textAlign': 'center',
                  'color': colors['text']
         }),
-        html.Label('Select countries (Some asian and eurupean countries are included for reference purposes)'),
+        html.Label('Seleccionar paises'),
         dcc.Dropdown(
             id='drop-country-list',
             options=[{'label': i, 'value': i} for i in countries],
             value=['Argentina', 'Brazil'],
             multi=True
         ),
-        html.H2('Since 01-22-2020'),
+        html.H2('Desde 01-22-2020'),
         dcc.RadioItems(
             id='yaxis-type',
             options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
@@ -54,7 +54,7 @@ app.layout = html.Div(
             labelStyle={'display': 'inline-block'}
         ),
         dcc.Graph(id=('graph-time-serie')),
-        html.H2('Since the first case in each country'),
+        html.H2('Desde el primer caso en cada país'),
         dcc.RadioItems(
             id='yaxis-type-day',
             options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
@@ -63,7 +63,7 @@ app.layout = html.Div(
         ),
         dcc.Graph(id=('graph-time-serie-day')),
         html.Footer(
-            children='By Giovanni D. Rottoli (gd.rottoli@gmail.com), data from https://github.com/CSSEGISandData/COVID-19'
+            children='Por Giovanni D. Rottoli (gd.rottoli@gmail.com), datos de https://github.com/CSSEGISandData/COVID-19'
         )
     ]
 )
