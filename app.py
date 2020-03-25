@@ -24,6 +24,7 @@ df_confirmed = df_confirmed.T
 #df_confirmed = df_confirmed.iloc[50:]
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
 
 colors = {
     'background': '#FFFFF',
