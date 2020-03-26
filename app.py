@@ -12,16 +12,12 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 data_url= {'confirmed': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
            'deaths': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'}
 
-countries = ['Argentina', 'Bolivia', 'Brazil', 'Chile', 'Colombia', 'Cuba', 'Ecuador', 'Germany', 'Guatemala','Italy','Japan','Korea, South','Mexico', 'Panama',
-             'Paraguay', 'Peru', 'Spain', 'Uruguay' ]
-
 df_confirmed = pd.read_csv(data_url['confirmed'])
-df_confirmed = df_confirmed[df_confirmed['Country/Region'].isin(countries)]
-df_confirmed = df_confirmed.drop(columns=['Province/State','Lat','Long'])
-df_confirmed = df_confirmed.set_index(['Country/Region'])
+df_confirmed.drop(['Province/State','Lat','Long'], axis = 1, inplace = True)
+df_confirmed = df_confirmed.groupby('Country/Region').sum()
+countries = df_confirmed.index.values
 df_confirmed = df_confirmed.T
-
-#df_confirmed = df_confirmed.iloc[50:]
+print(df_confirmed)
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
@@ -96,4 +92,4 @@ def update_figure_byday(selected_countries, yaxis_type):
     return fig
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
