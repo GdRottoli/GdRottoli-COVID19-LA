@@ -134,7 +134,25 @@ app.layout = html.Div(className="container", children = [
                         value='Linear',
                         labelStyle={'display': 'inline-block'}
                     ),
-                    dcc.Graph(id=('graph-33'))
+                    dcc.Graph(id=('graph-33')),
+
+                    html.H2('Porcentaje de casos recuperados'),
+                    dcc.RadioItems(
+                        id='yaxis-type-34',
+                        options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                        value='Linear',
+                        labelStyle={'display': 'inline-block'}
+                    ),
+                    dcc.Graph(id=('graph-34')),
+
+                    html.H2('Porcentaje de casos activos'),
+                    dcc.RadioItems(
+                        id='yaxis-type-35',
+                        options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                        value='Linear',
+                        labelStyle={'display': 'inline-block'}
+                    ),
+                    dcc.Graph(id=('graph-35'))
                 ]),
                 dcc.Tab(label='Fallecidos', children=[
 
@@ -164,6 +182,15 @@ app.layout = html.Div(className="container", children = [
                         labelStyle={'display': 'inline-block'}
                     ),
                     dcc.Graph(id=('graph-43')),
+
+                    html.H2('Proporción de fallecidos por cada 100 recuperados'),
+                    dcc.RadioItems(
+                        id='yaxis-type-44',
+                        options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                        value='Linear',
+                        labelStyle={'display': 'inline-block'}
+                    ),
+                    dcc.Graph(id=('graph-44'))
 
                 ])
 
@@ -359,6 +386,51 @@ def update_figure_recuperados_pordia(selected_countries, yaxis_type):
     return fig
 
 @app.callback(
+    Output('graph-34', 'figure'),
+    [Input('drop-country-list', 'value'),
+     Input('yaxis-type-34', 'value')]
+)
+def update_figure_tasa_actividad(selected_countries, yaxis_type):
+    fig = go.Figure()
+    for c in selected_countries:
+        confirmed = df_confirmed[c]
+        first_day = next(i for i, v in enumerate(confirmed) if v > 0)
+        deaths = df_deaths[c].tolist()
+        recovered = df_recovered[c].tolist()
+        values = [r / c for c, r, d in zip(confirmed[first_day:], recovered[first_day:], deaths[first_day:])]
+        fig.add_trace(go.Scatter(x=np.arange(len(values)), y=values, mode='lines+markers', name=c))
+    if (yaxis_type == 'Log'):
+        fig.update_layout(yaxis_type="log")
+    fig.update_layout(
+        xaxis_title="Días desde el primer caso",
+        yaxis_title="Porcentaje de casos recuperados",
+    )
+    return fig
+
+@app.callback(
+    Output('graph-35', 'figure'),
+    [Input('drop-country-list', 'value'),
+     Input('yaxis-type-35', 'value')]
+)
+def update_figure_tasa_actividad(selected_countries, yaxis_type):
+    fig = go.Figure()
+    for c in selected_countries:
+        confirmed = df_confirmed[c]
+        first_day = next(i for i, v in enumerate(confirmed) if v > 0)
+        deaths = df_deaths[c].tolist()
+        recovered = df_recovered[c].tolist()
+        values = [(c - r - d) / c for c, r, d in zip(confirmed[first_day:], recovered[first_day:], deaths[first_day:])]
+        fig.add_trace(go.Scatter(x=np.arange(len(values)), y=values, mode='lines+markers', name=c))
+    if (yaxis_type == 'Log'):
+        fig.update_layout(yaxis_type="log")
+    fig.update_layout(
+        xaxis_title="Días desde el primer caso",
+        yaxis_title="Porcentaje de casos activos",
+    )
+    return fig
+
+
+@app.callback(
     Output('graph-41', 'figure'),
     [Input('drop-country-list', 'value'),
      Input('yaxis-type-41', 'value')]
@@ -420,6 +492,27 @@ def update_figure_letalidad(selected_countries, yaxis_type):
     fig.update_layout(
         xaxis_title="Días desde el primer caso",
         yaxis_title="Porcentaje de Letalidad",
+    )
+    return fig
+
+@app.callback(
+    Output('graph-44', 'figure'),
+    [Input('drop-country-list', 'value'),
+     Input('yaxis-type-44', 'value')]
+)
+def update_figure_letalidad_recuperados(selected_countries, yaxis_type):
+    fig = go.Figure()
+    for c in selected_countries:
+        recovered = df_recovered[c]
+        first_day = next(i for i, v in enumerate(recovered) if v > 0)
+        deaths = df_deaths[c].tolist()
+        values = [d*100/r for r, d in zip(recovered[first_day:], deaths[first_day:])]
+        fig.add_trace(go.Scatter(x=np.arange(len(values)), y=values, mode='lines+markers', name=c))
+    if (yaxis_type == 'Log'):
+        fig.update_layout(yaxis_type="log")
+    fig.update_layout(
+        xaxis_title="Días desde el primer caso",
+        yaxis_title="Cantidad de personas fallecidas por cada 100 recuperadas",
     )
     return fig
 
